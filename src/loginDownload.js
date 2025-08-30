@@ -53,7 +53,7 @@ export async function descargarReporte(codigoFicha) {
 
         // Llenar el código de la ficha y agregarlo
         await modalFrame.fill('input[id$="codigoFichaITX"]', codigoFicha);
-        await modalFrame.click('button[id$="bfrmForma1:btnConsultar"]');
+        await modalFrame.getByRole('button', { name: 'Consultar' }).click();
         await modalFrame.click('button[id$="dtFichas"]');
 
         try {
