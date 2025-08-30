@@ -13,16 +13,14 @@ export async function descargarReporte(codigoFicha) {
   await page.waitForSelector('#registradoBox1', { timeout: 60000 });
 
   const fh = await page.$('#registradoBox1');// ajusta el selector
-  const frame = await fh.contentFrame(); 
+  const frame = await fh.contentFrame();
   await frame.getByRole('textbox', { name: 'Número de Documento' }).fill(cfg.sofiaUser);
   const usuarioInput = frame.getByRole('textbox', { name: 'Número de Documento' });
   await usuarioInput.waitFor({ timeout: 60000 });
   await usuarioInput.fill(cfg.sofiaUser);
   await frame.getByRole('textbox', { name: 'Contraseña' }).fill(cfg.sofiaPass);
-  await Promise.all([
-    page.waitForNavigation(),
-    page.getByRole('button', { name: 'Ingresar' }).click()
-  ]);
+  await frame.getByRole('button', { name: 'Ingresar' }).click();
+  await page.waitForSelector('text=Lista de Roles');
 
   await Promise.all([
     page.waitForNavigation(),
