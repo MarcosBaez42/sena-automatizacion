@@ -1,0 +1,16 @@
+{
+  "name": "sena-automatizacion",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "stats": "node src/stats.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.0",
+    "exceljs": "^4.4.0",
+    "express": "^4.19.0",
+    "nodemailer": "^6.9.8",
+    "playwright": "^1.42.0"
+  }
+}
