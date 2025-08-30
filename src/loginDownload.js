@@ -20,40 +20,33 @@ export async function descargarReporte(codigoFicha) {
   await frame.getByRole('button', { name: 'Ingresar' }).click();
   await page.waitForSelector('text=Lista de Roles');
 
-  await Promise.all([
-    page.waitForNavigation(),
-    page.getByRole('link', { name: 'Lista de Roles' }).click()
-  ]);
+  await page.getByRole('link', { name: 'Lista de Roles' }).click();
+  await page.waitForSelector('[id="seleccion Rol:roles"]');
 
-  await Promise.all([
-    page.waitForNavigation(),
-    page.locator('[id="seleccion Rol:roles"]').getByRole('option', { name: 'Gestión Desarrollo Curricular' }).click()
-  ]);
+  await page
+    .locator('[id="seleccion Rol:roles"]')
+    .getByRole('option', { name: 'Gestión Desarrollo Curricular' })
+    .click();
+  await page.waitForSelector('text=Ejecución de la Formación');
 
-  await Promise.all([
-    page.waitForNavigation(),
-    page.getByRole('link', { name: 'Ejecución de la Formación' }).click()
-  ]);
+  await page.getByRole('link', { name: 'Ejecución de la Formación' }).click();
+  await page.waitForSelector('text=Administrar Ruta de Aprendizaje');
 
-  await Promise.all([
-    page.waitForNavigation(),
-    page.getByRole('link', { name: 'Administrar Ruta de Aprendizaje' }).click()
-  ]);
+  await page.getByRole('link', { name: 'Administrar Ruta de Aprendizaje' }).click();
+  await page.waitForSelector('text=Reportes');
 
-  await Promise.all([
-    page.waitForNavigation(),
-    page.getByRole('link', { name: 'Reportes' }).click()
-  ]);
+  await page.getByRole('link', { name: 'Reportes' }).click();
+  await page.waitForSelector('text=Reporte de Juicios de Evaluación');
 
-  await Promise.all([
-    page.waitForNavigation(),
-    page.getByRole('link', { name: 'Reporte de Juicios de Evaluación' }).click()
-  ]);
+  await page
+    .getByRole('link', { name: 'Reporte de Juicios de Evaluación' })
+    .click();
+  await page.waitForSelector('text=Buscar Ficha de Caracterización');
 
-  await Promise.all([
-    page.waitForNavigation(),
-    page.getByRole('link', { name: 'Buscar Ficha de Caracterización' }).click()
-  ]);
+  await page
+    .getByRole('link', { name: 'Buscar Ficha de Caracterización' })
+    .click();
+  await page.waitForSelector('#codigoFicha');
 
   await page.fill('#codigoFicha', codigoFicha);
   await page.click('#btnBuscarFicha');
