@@ -41,7 +41,7 @@ export async function descargarReporte(codigoFicha) {
 
         // Re-captura el iframe ya con la página cargada del reporte
         const contenidoHandle2 = await page.waitForSelector('iframe#contenido', { timeout: 60000 });
-        const frame2 = await contenidoHandle2.contentFrame();
+        let frame2 = await contenidoHandle2.contentFrame();
 
         // Dentro del iframe: Buscar ficha → llenar → agregar → generar
         await frame2.getByRole('link', { name: 'Buscar Ficha de Caracterización' }).click();
@@ -55,6 +55,14 @@ export async function descargarReporte(codigoFicha) {
         await modalFrame.fill('input[id$="codigoFichaITX"]', codigoFicha);
         await modalFrame.click('button[id$="bfrmForma1:btnConsultar"]');
         await modalFrame.click('button[id$="dtFichas"]');
+
+        try {
+            await frame2.waitForLoadState('domcontentloaded');
+        } catch {
+            const contenidoHandle3 = await page.waitForSelector('iframe#contenido', { timeout: 60000 });
+            frame2 = await contenidoHandle3.contentFrame();
+        }
+        await frame2.waitForSelector('input#frmForma1\\:btnConsultar');
 
         const [download] = await Promise.all([
             page.waitForEvent('download'),
