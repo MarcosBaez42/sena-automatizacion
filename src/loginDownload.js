@@ -53,12 +53,12 @@ export async function descargarReporte(codigoFicha) {
 
         // Llenar el código de la ficha y agregarlo
         await modalFrame.fill('input[id$="codigoFichaITX"]', codigoFicha);
-        await modalFrame.click('button[id$="botonConsultar"]');
+        await modalFrame.click('button[id$="bfrmForma1:btnConsultar"]');
         await modalFrame.click('button[id$="dtFichas"]');
 
         const [download] = await Promise.all([
             page.waitForEvent('download'),
-            frame2.click('#btnGenerarReporte'),
+            frame2.getByRole('button', { name: 'Generar Reporte' }).click(),
         ]);
 
         const filePath = path.join(cfg.outputDir, await download.suggestedFilename());
