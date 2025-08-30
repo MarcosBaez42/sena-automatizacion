@@ -14,10 +14,8 @@ export async function descargarReporte(codigoFicha) {
 
   const fh = await page.$('#registradoBox1');// ajusta el selector
   const frame = await fh.contentFrame();
+  await frame.waitForSelector('input#username');
   await frame.getByRole('textbox', { name: 'Número de Documento' }).fill(cfg.sofiaUser);
-  const usuarioInput = frame.getByRole('textbox', { name: 'Número de Documento' });
-  await usuarioInput.waitFor({ timeout: 60000 });
-  await usuarioInput.fill(cfg.sofiaUser);
   await frame.getByRole('textbox', { name: 'Contraseña' }).fill(cfg.sofiaPass);
   await frame.getByRole('button', { name: 'Ingresar' }).click();
   await page.waitForSelector('text=Lista de Roles');
