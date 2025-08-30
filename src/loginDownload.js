@@ -9,7 +9,7 @@ export async function descargarReporte(codigoFicha) {
 
   await page.goto('http://senasofiaplus.edu.co/sofia-public/');
 
-  await page.fill('#usuario', cfg.sofiaUser);
+  await page.fill('#NumeroDocumento', cfg.sofiaUser);
   await page.fill('#clave', cfg.sofiaPass);
   await page.click('#btnIngresar');
 
