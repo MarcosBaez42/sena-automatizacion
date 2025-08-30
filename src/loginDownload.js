@@ -6,22 +6,53 @@ import path from 'path';
 export async function descargarReporte(codigoFicha) {
   const browser = await chromium.launch({ headless: true });
   try {
-  const page = await browser.newPage();
+    const page = await browser.newPage();
 
   await page.goto('http://senasofiaplus.edu.co/sofia-public/');
 
-  await page.waitForSelector('#usuario', { timeout: 60000 });
-  await page.fill('#usuario', cfg.sofiaUser);
-  await page.fill('#clave', cfg.sofiaPass);
-  await page.click('#btnIngresar');
+  const usuarioInput = page.getByRole('textbox', { name: 'Número de Documento' });
+  await usuarioInput.waitFor({ timeout: 60000 });
+  await usuarioInput.fill(cfg.sofiaUser);
+  await page.getByRole('textbox', { name: 'Contraseña' }).fill(cfg.sofiaPass);
+  await Promise.all([
+    page.waitForNavigation(),
+    page.getByRole('button', { name: 'Ingresar' }).click()
+  ]);
 
-  await page.getByText('Lista de Roles').click();
-  await page.getByText('Gestión Desarrollo Curricular').click();
-  await page.getByText('Ejecución de la Formación').click();
-  await page.getByText('Administrar Ruta de Aprendizaje').click();
-  await page.getByText('Reportes').click();
-  await page.getByText('Reporte de Juicios de Evaluación').click();
-  await page.getByText('Buscar Ficha de Caracterización').click();
+  await Promise.all([
+    page.waitForNavigation(),
+    page.getByRole('link', { name: 'Lista de Roles' }).click()
+  ]);
+
+  await Promise.all([
+    page.waitForNavigation(),
+    page.locator('[id="seleccion Rol:roles"]').getByRole('option', { name: 'Gestión Desarrollo Curricular' }).click()
+  ]);
+
+  await Promise.all([
+    page.waitForNavigation(),
+    page.getByRole('link', { name: 'Ejecución de la Formación' }).click()
+  ]);
+
+  await Promise.all([
+    page.waitForNavigation(),
+    page.getByRole('link', { name: 'Administrar Ruta de Aprendizaje' }).click()
+  ]);
+
+  await Promise.all([
+    page.waitForNavigation(),
+    page.getByRole('link', { name: 'Reportes' }).click()
+  ]);
+
+  await Promise.all([
+    page.waitForNavigation(),
+    page.getByRole('link', { name: 'Reporte de Juicios de Evaluación' }).click()
+  ]);
+
+  await Promise.all([
+    page.waitForNavigation(),
+    page.getByRole('link', { name: 'Buscar Ficha de Caracterización' }).click()
+  ]);
 
   await page.fill('#codigoFicha', codigoFicha);
   await page.click('#btnBuscarFicha');
