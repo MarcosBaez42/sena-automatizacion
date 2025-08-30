@@ -12,12 +12,12 @@ export async function descargarReporte(codigoFicha) {
   await page.waitForLoadState('domcontentloaded');
   await page.waitForSelector('#registradoBox1', { timeout: 60000 });
 
-  const fh = await page.$('#registradoBox1');// ajusta el selector
-  const frame = await fh.contentFrame();
-  await frame.waitForSelector('input#username');
-  await frame.getByRole('textbox', { name: 'Número de Documento' }).fill(cfg.sofiaUser);
-  await frame.getByRole('textbox', { name: 'Contraseña' }).fill(cfg.sofiaPass);
-  await frame.getByRole('button', { name: 'Ingresar' }).click();
+  const fh = await page.$('#registradoBox1'); // ajusta el selector
+  const loginFrame = await fh.contentFrame();
+  await loginFrame.waitForSelector('input#username');
+  await loginFrame.getByRole('textbox', { name: 'Número de Documento' }).fill(cfg.sofiaUser);
+  await loginFrame.getByRole('textbox', { name: 'Contraseña' }).fill(cfg.sofiaPass);
+  await loginFrame.getByRole('button', { name: 'Ingresar' }).click();
   try {
     await page.waitForSelector('text=Lista de Roles', { timeout: 15000 });
   } catch (e) {
@@ -27,34 +27,37 @@ export async function descargarReporte(codigoFicha) {
   await page.getByRole('combobox', { name: 'Lista de Roles' }).click();
   await page.waitForSelector('#seleccionRol\\:roles');
   await page.selectOption('#seleccionRol\\:roles', { value: '17' });
-  await page.waitForSelector('text=Ejecución de la Formación');
 
-  await page.getByRole('link', { name: 'Ejecución de la Formación' }).click();
-  await page.waitForSelector('text=Administrar Ruta de Aprendizaje');
+  const contenidoHandle = await page.waitForSelector('#contenido');
+  const frame = await contenidoHandle.contentFrame();
+  await frame.waitForSelector('text=Ejecución de la Formación');
 
-  await page.getByRole('link', { name: 'Administrar Ruta de Aprendizaje' }).click();
-  await page.waitForSelector('text=Reportes');
+  await frame.getByRole('link', { name: 'Ejecución de la Formación' }).click();
+  await frame.waitForSelector('text=Administrar Ruta de Aprendizaje');
 
-  await page.getByRole('link', { name: 'Reportes' }).click();
-  await page.waitForSelector('text=Reporte de Juicios de Evaluación');
+  await frame.getByRole('link', { name: 'Administrar Ruta de Aprendizaje' }).click();
+  await frame.waitForSelector('text=Reportes');
 
-  await page
+  await frame.getByRole('link', { name: 'Reportes' }).click();
+  await frame.waitForSelector('text=Reporte de Juicios de Evaluación');
+
+  await frame
     .getByRole('link', { name: 'Reporte de Juicios de Evaluación' })
     .click();
-  await page.waitForSelector('text=Buscar Ficha de Caracterización');
+  await frame.waitForSelector('text=Buscar Ficha de Caracterización');
 
-  await page
+  await frame
     .getByRole('link', { name: 'Buscar Ficha de Caracterización' })
     .click();
-  await page.waitForSelector('#codigoFicha');
+  await frame.waitForSelector('#codigoFicha');
 
-  await page.fill('#codigoFicha', codigoFicha);
-  await page.click('#btnBuscarFicha');
-  await page.click('#btnAgregar');
+  await frame.fill('#codigoFicha', codigoFicha);
+  await frame.click('#btnBuscarFicha');
+  await frame.click('#btnAgregar');
 
   const [download] = await Promise.all([
     page.waitForEvent('download'),
-    page.click('#btnGenerarReporte')
+    frame.click('#btnGenerarReporte')
   ]);
 
   const filePath = path.join(cfg.outputDir, await download.suggestedFilename());
