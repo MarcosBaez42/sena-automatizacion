@@ -4,16 +4,18 @@ import { cfg } from './config.js';
 import path from 'path';
 
 export async function descargarReporte(codigoFicha) {
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({ headless: false, slowMo: 100 });
   try {
     const page = await browser.newPage();
 
   await page.goto('http://senasofiaplus.edu.co/sofia-public/');
 
-  const usuarioInput = page.getByRole('textbox', { name: 'Número de Documento' });
+  const frame = page.frameLocator('iframe[src*="login"]'); // ajusta el selector
+  await frame.getByRole('textbox', { name: 'Número de Documento' }).fill(cfg.sofiaUser);
+  const usuarioInput = frame.getByRole('textbox', { name: 'Número de Documento' });
   await usuarioInput.waitFor({ timeout: 60000 });
   await usuarioInput.fill(cfg.sofiaUser);
-  await page.getByRole('textbox', { name: 'Contraseña' }).fill(cfg.sofiaPass);
+  await frame.getByRole('textbox', { name: 'Contraseña' }).fill(cfg.sofiaPass);
   await Promise.all([
     page.waitForNavigation(),
     page.getByRole('button', { name: 'Ingresar' }).click()
