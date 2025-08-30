@@ -1,20 +1,22 @@
-import ExcelJS from 'exceljs';
+import xlsx from 'xlsx';
 
-export async function obtenerFaltantes(rutaArchivo) {
-  const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.readFile(rutaArchivo);
-  const sheet = workbook.getWorksheet(1);
+export function obtenerFaltantes(rutaArchivo) {
+  const workbook = xlsx.readFile(rutaArchivo);
+  const sheetName = workbook.SheetNames[0];
+  const sheet = workbook.Sheets[sheetName];
+  const rows = xlsx.utils.sheet_to_json(sheet, { header: 1 });
 
   const faltantes = [];
-  sheet.eachRow((row, rowNum) => {
-    const cod = row.getCell(1).text.trim();
-    const nombre = row.getCell(2).text.trim();
-    const correo = row.getCell(3).text.trim();
-    const juicio = row.getCell(5).text.trim();
+  rows.forEach((row) => {
+    const cod = (row[0] || '').toString().trim();
+    const nombre = (row[1] || '').toString().trim();
+    const correo = (row[2] || '').toString().trim();
+    const juicio = (row[4] || '').toString().trim();
 
-    if (!juicio) {
+    if (cod && nombre && correo && !juicio) {
       faltantes.push({ cod, nombre, correo });
     }
   });
+
   return faltantes;
 }
