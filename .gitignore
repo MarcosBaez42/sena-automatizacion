@@ -1,15 +1,2 @@
 node_modules/
-# Carpetas grandes que no deben subirse
-venv/
-.venv/
-audio_procesado/
-*.wav
-*.mp3
-*.dll
-*.lib
-*.pyc
-__pycache__/
 .env
-transcripciones/
-versiones/
-uploads/
