@@ -18,7 +18,11 @@ export async function descargarReporte(codigoFicha) {
   await frame.getByRole('textbox', { name: 'Número de Documento' }).fill(cfg.sofiaUser);
   await frame.getByRole('textbox', { name: 'Contraseña' }).fill(cfg.sofiaPass);
   await frame.getByRole('button', { name: 'Ingresar' }).click();
-  await page.waitForSelector('text=Lista de Roles');
+  try {
+    await page.waitForSelector('text=Lista de Roles', { timeout: 15000 });
+  } catch (e) {
+    throw new Error('Credenciales inválidas o fallo en el login');
+  }
 
   await page.getByRole('link', { name: 'Lista de Roles' }).click();
   await page.waitForSelector('[id="seleccion Rol:roles"]');
