@@ -34,10 +34,10 @@ export async function descargarReporte(codigoFicha) {
         // Abre: Ejecución de la Formación → Administrar Ruta de Aprendizaje → Reportes
         await page.getByRole('link', { name: 'Ejecución de la Formación' }).click();
         await page.getByRole('link', { name: 'Administrar Ruta de Aprendizaje' }).click();
-        await page.getByRole('link', { name: 'Reportes' }).click();
+        await page.getByRole('link', { name: 'Reportes ', exact: true }).click();
 
         // Este sí navega dentro del iframe `contenido`
-        await page.getByRole('link', { name: 'Reporte de Juicios de Evaluación' }).click();
+        await page.getByRole('link', { name: 'Reporte de Juicios de Evaluación', exact: true }).first().click();
 
         // Re-captura el iframe ya con la página cargada del reporte
         const contenidoHandle2 = await page.waitForSelector('iframe#contenido', { timeout: 60000 });
@@ -45,6 +45,8 @@ export async function descargarReporte(codigoFicha) {
 
         // Dentro del iframe: Buscar ficha → llenar → agregar → generar
         await frame2.getByRole('link', { name: 'Buscar Ficha de Caracterización' }).click();
+        await frame2.waitForSelector('input#form:codigoFichaITX',);
+        await frame2.getByRole('textbox', { name: 'Ingrese el Código de la Ficha de Caracterización' }).click();
         await frame2.waitForSelector('#codigoFicha', { timeout: 60000 });
         await frame2.fill('#codigoFicha', codigoFicha);
         await frame2.click('#btnBuscarFicha');
