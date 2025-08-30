@@ -9,6 +9,11 @@ export async function descargarReporte(codigoFicha) {
     const page = await browser.newPage();
 
   await page.goto('http://senasofiaplus.edu.co/sofia-public/');
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForSelector('iframe[src*="login"]', {
+    state: 'attached',
+    timeout: 60000
+  });
 
   const frame = page.frameLocator('iframe[src*="login"]'); // ajusta el selector
   await frame.getByRole('textbox', { name: 'Número de Documento' }).fill(cfg.sofiaUser);
