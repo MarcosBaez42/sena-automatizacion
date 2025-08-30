@@ -54,7 +54,12 @@ export async function descargarReporte(codigoFicha) {
         // Llenar el código de la ficha y agregarlo
         await modalFrame.fill('input[id$="codigoFichaITX"]', codigoFicha);
         await modalFrame.getByRole('button', { name: 'Consultar' }).click();
-        await modalFrame.click('button[id$="dtFichas"]');
+        await modalFrame.waitForSelector('table[id$="dtFichas"] tbody tr');
+        const firstRow = modalFrame.locator('table[id$="dtFichas"] tbody tr').first();
+        await firstRow
+            .locator('button, a')
+            .first()
+            .click(); // o selector equivalente del botón “Agregar/Seleccionar”
 
         try {
             await frame2.waitForLoadState('domcontentloaded');
