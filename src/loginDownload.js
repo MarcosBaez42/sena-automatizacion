@@ -45,12 +45,16 @@ export async function descargarReporte(codigoFicha) {
 
         // Dentro del iframe: Buscar ficha → llenar → agregar → generar
         await frame2.getByRole('link', { name: 'Buscar Ficha de Caracterización' }).click();
-        await frame2.waitForSelector('input#form:codigoFichaITX',);
-        await frame2.getByRole('textbox', { name: 'Ingrese el Código de la Ficha de Caracterización' }).click();
-        await frame2.waitForSelector('#codigoFicha', { timeout: 60000 });
-        await frame2.fill('#codigoFicha', codigoFicha);
-        await frame2.click('#btnBuscarFicha');
-        await frame2.click('#btnAgregar');
+
+        // Esperar el iframe del buscador y asegurar que cargue su contenido
+        const modalHandle = await frame2.waitForSelector('iframe#modalDialogContentviewDialog2', { timeout: 60000 });
+        const modalFrame = await modalHandle.contentFrame();
+        await modalFrame.waitForSelector('input[id$="codigoFichaITX"]', { timeout: 60000 });
+
+        // Llenar el código de la ficha y agregarlo
+        await modalFrame.fill('input[id$="codigoFichaITX"]', codigoFicha);
+        await modalFrame.click('button[id$="botonConsultar"]');
+        await modalFrame.click('button[id$="dtFichas"]');
 
         const [download] = await Promise.all([
             page.waitForEvent('download'),
