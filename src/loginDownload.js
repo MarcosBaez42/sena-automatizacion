@@ -24,13 +24,9 @@ export async function descargarReporte(codigoFicha) {
     throw new Error('Credenciales inválidas o fallo en el login');
   }
 
-  await page.getByRole('link', { name: 'Lista de Roles' }).click();
-  await page.waitForSelector('[id="seleccion Rol:roles"]');
-
-  await page
-    .locator('[id="seleccion Rol:roles"]')
-    .getByRole('option', { name: 'Gestión Desarrollo Curricular' })
-    .click();
+  await page.getByRole('combobox', { name: 'Lista de Roles' }).click();
+  await page.waitForSelector('#seleccionRol\\:roles');
+  await page.selectOption('#seleccionRol\\:roles', { value: '17' });
   await page.waitForSelector('text=Ejecución de la Formación');
 
   await page.getByRole('link', { name: 'Ejecución de la Formación' }).click();
