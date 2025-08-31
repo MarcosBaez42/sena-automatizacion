@@ -1,5 +1,14 @@
 import xlsx from 'xlsx';
 
+const shouldLog = !['0', 'false'].includes(
+  (process.env.PARSE_EXCEL_LOGS || '').toLowerCase()
+);
+const log = (...args) => {
+  if (shouldLog) {
+    console.log(...args);
+  }
+};
+
 const limpiarTexto = (texto = '') =>
   texto
     .toString()
@@ -9,11 +18,13 @@ const limpiarTexto = (texto = '') =>
 
 export async function obtenerFaltantes(rutaArchivo) {
   const workbook = xlsx.readFile(rutaArchivo);
+  log('Workbook.SheetNames:', workbook.SheetNames);
+
   const worksheet = workbook.Sheets[workbook.SheetNames[0]];
   const rows = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
 
   const faltantes = [];
-  const juiciosFaltantes = ['por evaluar']; // comparar en minúsculas
+  const juiciosFaltantes = ['por evaluar', 'sin evaluar'];
   let total = 0;
   let porEvaluar = 0;
   let aprobados = 0;
@@ -22,39 +33,46 @@ export async function obtenerFaltantes(rutaArchivo) {
     return { total, faltantes, porEvaluar, aprobados };
   }
 
-    const headers = rows[0].map((h) => limpiarTexto(h));
-    const idxCod = headers.findIndex(
-      (h) => h.includes('documento') || h.includes('codigo')
-    );
-    const idxNombre = headers.findIndex((h) => h.includes('nombre'));
-    const idxCorreo = headers.findIndex((h) => h.includes('correo'));
-    const idxJuicio = headers.findIndex((h) => h.includes('juicio'));
+  const headerIndex = rows.findIndex(row => 
+    row.some(cell => limpiarTexto(cell).includes('tipo de documento'))
+  );
 
-    const codIndex = idxCod > -1 ? idxCod : 0;
-    const nombreIndex = idxNombre > -1 ? idxNombre : 1;
+  if (headerIndex === -1) {
+    log('No se encontró la fila de encabezados esperada.');
+    return { total, faltantes, porEvaluar, aprobados };
+  }
+  
+  const headersRow = rows[headerIndex];
+  const headers = headersRow.map((h) => limpiarTexto(h));
+  const idxCod = headers.findIndex((h) => h.includes('documento'));
+  const idxNombre = headers.findIndex((h) => h.includes('nombre'));
+  const idxJuicio = headers.findIndex((h) => h.includes('juicio'));
 
-    for (const row of rows.slice(1)) {
-      const cod = (row[codIndex] || '').toString().trim();
-      const nombre = (row[nombreIndex] || '').toString().trim();
-      const correo = (row[idxCorreo > -1 ? idxCorreo : 2] || '')
-        .toString()
-        .trim();
-      const juicio = (row[idxJuicio > -1 ? idxJuicio : 4] || '')
-        .toString()
-        .trim()
-        .toLowerCase();
+  log('Fila de encabezados:', headersRow);
+  log('Índices -> cod:', idxCod, 'nombre:', idxNombre, 'juicio:', idxJuicio);
 
-      // Cuenta el aprendiz aunque no tenga correo
-      if (cod && nombre) {
-        total++;
-        if (juicio.includes('por evaluar')) {
-          porEvaluar++;
-          if (correo) faltantes.push({ cod, nombre, correo }); // lista para avisos
-        } else if (juicio.startsWith('aprob')) {
-          aprobados++;
-        }
+  const codIndex = idxCod > -1 ? idxCod : 0;
+  const nombreIndex = idxNombre > -1 ? idxNombre : 1;
+
+  for (const row of rows.slice(headerIndex + 1)) {
+    const cod = (row[idxCod] || '').toString().trim();
+    const nombre = (row[idxNombre] || '').toString().trim();
+    const juicio = (row[idxJuicio] || '')
+      .toString()
+      .trim()
+      .toLowerCase();
+
+    if (cod && nombre) {
+      total++;
+      if (juiciosFaltantes.includes(juicio)) {
+        porEvaluar++;
+        // No se agrega el campo 'correo' ya que no existe en el archivo
+        faltantes.push({ nombre, cod });
+      } else if (juicio.includes('aprobado')) {
+        aprobados++;
       }
     }
+  }
 
   return { total, faltantes, porEvaluar, aprobados };
 }

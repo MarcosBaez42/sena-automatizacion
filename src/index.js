@@ -3,19 +3,28 @@ import { obtenerFaltantes } from './parseExcel.js';
 import { enviarAviso } from './sendMail.js';
 import fs from 'fs/promises';
 
-const CODIGOS_FICHA = ['2671841', '2627096', '3138270']; // Fichas a revisar
+const CODIGOS_FICHA = ['2671841', '2627096', '3138270'];
 
 async function procesarFicha(codigo) {
   console.log(`Procesando ficha ${codigo}...`);
   const archivo = await descargarReporte(codigo);
   const { total, faltantes, porEvaluar, aprobados } = await obtenerFaltantes(archivo);
 
+  console.log(`Ficha ${codigo} - ${porEvaluar} aprendices con juicio pendiente.`);
+  
+  // Como el archivo .xls no tiene correo, no se pueden enviar los avisos.
+  // Se imprime en consola la lista de aprendices por evaluar.
+  console.log('Aprendices con juicio pendiente:');
   for (const est of faltantes) {
-    console.log(`Avisando a ${est.correo}`);
-    await enviarAviso(est.correo, est.nombre, codigo);
+    console.log(`- ${est.nombre} (${est.cod})`);
   }
 
-   await registrarResultado(codigo, total, porEvaluar, aprobados);
+  // Comentar la siguiente línea ya que no se puede enviar el correo sin la dirección
+  // for (const est of faltantes) {
+  //   await enviarAviso(est.correo, est.nombre, codigo);
+  // }
+
+  await registrarResultado(codigo, total, porEvaluar, aprobados);
 }
 
 async function registrarResultado(codigo, total, porEvaluar, aprobados) {
@@ -32,14 +41,11 @@ async function registrarResultado(codigo, total, porEvaluar, aprobados) {
   datos.fichas = datos.fichas.filter(f => f.codigo !== codigo);
   datos.fichas.push(entry);
 
-  await fs.mkdir('./data', { recursive: true });
-  await fs.writeFile(DATA_FILE, JSON.stringify(datos, null, 2));
+  await fs.writeFile(DATA_FILE, JSON.stringify(datos, null, 2), 'utf8');
 }
 
-async function main() {
-  for (const ficha of CODIGOS_FICHA) {
-    await procesarFicha(ficha);
+(async () => {
+  for (const codigo of CODIGOS_FICHA) {
+    await procesarFicha(codigo);
   }
-}
-
-main();
+})();
