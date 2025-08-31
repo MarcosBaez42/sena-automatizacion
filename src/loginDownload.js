@@ -75,13 +75,14 @@ export async function descargarReporte(codigoFicha) {
         ]);
 
         const suggested = await download.suggestedFilename();
-        console.log('Nombre sugerido por Sofía:', suggested); // <-- LOG útil
+        const ext = path.extname(suggested);
+        const base = path.basename(suggested, ext);
+        const finalName = `${base} ${codigoFicha}${ext}`;
+        console.log('Nombre sugerido por Sofía:', finalName);
 
-        const filePath = path.join(cfg.outputDir, suggested);
+        const filePath = path.join(cfg.outputDir, finalName);
         await fs.mkdir(cfg.outputDir, { recursive: true });
         await download.saveAs(filePath);
-
-        return filePath;
 
         return filePath;
     } catch (error) {
