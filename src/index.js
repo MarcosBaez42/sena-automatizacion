@@ -8,17 +8,17 @@ const CODIGOS_FICHA = ['2671841', '2627096', '3138270']; // Fichas a revisar
 async function procesarFicha(codigo) {
   console.log(`Procesando ficha ${codigo}...`);
   const archivo = await descargarReporte(codigo);
-  const { total, faltantes } = await obtenerFaltantes(archivo);
+  const { total, faltantes, porEvaluar, aprobados } = await obtenerFaltantes(archivo);
 
   for (const est of faltantes) {
     console.log(`Avisando a ${est.correo}`);
     await enviarAviso(est.correo, est.nombre, codigo);
   }
 
-  await registrarResultado(codigo, faltantes.length, total);
+   await registrarResultado(codigo, total, porEvaluar, aprobados);
 }
 
-async function registrarResultado(codigo, faltan, total) {
+async function registrarResultado(codigo, total, porEvaluar, aprobados) {
   const DATA_FILE = './data/resultados.json';
   let datos = { fichas: [] };
 
@@ -27,7 +27,8 @@ async function registrarResultado(codigo, faltan, total) {
     datos = JSON.parse(raw);
   } catch (_) {}
 
-  const entry = { codigo, total, faltantes: faltan, completos: total - faltan };
+  const entry = { codigo, total, porEvaluar, aprobados };
+
   datos.fichas = datos.fichas.filter(f => f.codigo !== codigo);
   datos.fichas.push(entry);
 

@@ -1,32 +1,35 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>Estadísticas Juicios</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-<canvas id="grafico"></canvas>
-<script>
-async function cargar() {
-  const res = await fetch('/datos');
-  const datos = await res.json();
-  const labels = datos.fichas.map(f => f.codigo);
-  const completos = datos.fichas.map(f => f.completos);
-  const faltantes = datos.fichas.map(f => f.faltantes);
 
-  new Chart(document.getElementById('grafico'), {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        { label: 'Completos', data: completos, backgroundColor: 'green' },
-        { label: 'Faltantes', data: faltantes, backgroundColor: 'red' }
-      ]
-    }
-  });
-}
-cargar();
-</script>
+<head>
+    <meta charset="UTF-8">
+    <title>Estadísticas Juicios</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <canvas id="grafico"></canvas>
+    <script>
+        async function cargar() {
+            const res = await fetch('/datos');
+            const datos = await res.json();
+            const labels = datos.fichas.map(f => f.codigo);
+            const porEvaluar = datos.fichas.map(f => f.porEvaluar || 0);
+            const aprobados = datos.fichas.map(f => f.aprobados || 0);
+
+            new Chart(document.getElementById('grafico'), {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: 'Por evaluar', data: porEvaluar, backgroundColor: 'orange' },
+                        { label: 'Aprobados', data: aprobados, backgroundColor: 'green' },
+                    ]
+                }
+            });
+        }
+        cargar();
+    </script>
 </body>
+
 </html>

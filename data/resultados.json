@@ -3,8 +3,20 @@
     {
       "codigo": "2671841",
       "total": 1861,
-      "faltantes": 0,
-      "completos": 1861
+      "porEvaluar": 0,
+      "aprobados": 0
+    },
+    {
+      "codigo": "2627096",
+      "total": 3976,
+      "porEvaluar": 0,
+      "aprobados": 0
+    },
+    {
+      "codigo": "3138270",
+      "total": 1041,
+      "porEvaluar": 0,
+      "aprobados": 0
     }
   ]
 }
