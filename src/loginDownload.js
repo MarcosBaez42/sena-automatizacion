@@ -74,9 +74,14 @@ export async function descargarReporte(codigoFicha) {
             frame2.getByRole('button', { name: 'Generar Reporte' }).click(),
         ]);
 
-        const filePath = path.join(cfg.outputDir, await download.suggestedFilename());
+        const suggested = await download.suggestedFilename();
+        console.log('Nombre sugerido por Sofía:', suggested); // <-- LOG útil
+
+        const filePath = path.join(cfg.outputDir, suggested);
         await fs.mkdir(cfg.outputDir, { recursive: true });
         await download.saveAs(filePath);
+
+        return filePath;
 
         return filePath;
     } catch (error) {
