@@ -2,21 +2,21 @@
   "fichas": [
     {
       "codigo": "2671841",
-      "total": 1,
-      "porEvaluar": 0,
-      "aprobados": 1
+      "total": 1860,
+      "porEvaluar": 548,
+      "aprobados": 1312
     },
     {
       "codigo": "2627096",
-      "total": 2,
-      "porEvaluar": 0,
-      "aprobados": 2
+      "total": 2624,
+      "porEvaluar": 1050,
+      "aprobados": 1574
     },
     {
       "codigo": "3138270",
-      "total": 1,
-      "porEvaluar": 0,
-      "aprobados": 1
+      "total": 2624,
+      "porEvaluar": 1050,
+      "aprobados": 1574
     }
   ]
 }

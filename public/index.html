@@ -16,6 +16,7 @@
             const labels = datos.fichas.map(f => f.codigo);
             const porEvaluar = datos.fichas.map(f => f.porEvaluar || 0);
             const aprobados = datos.fichas.map(f => f.aprobados || 0);
+            const total = datos.fichas.map(f => f.total || 0);
 
             new Chart(document.getElementById('grafico'), {
                 type: 'bar',
@@ -24,6 +25,7 @@
                     datasets: [
                         { label: 'Por evaluar', data: porEvaluar, backgroundColor: 'orange' },
                         { label: 'Aprobados', data: aprobados, backgroundColor: 'green' },
+                        { label: 'Total', data: total, backgroundColor: 'grey' }
                     ]
                 }
             });

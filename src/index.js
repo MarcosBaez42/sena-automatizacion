@@ -1,13 +1,13 @@
-import { descargarReporte } from './loginDownload.js';
+import { iniciarSesion, descargarReporte } from './loginDownload.js';
 import { obtenerFaltantes } from './parseExcel.js';
 import { enviarAviso } from './sendMail.js';
 import fs from 'fs/promises';
 
 const CODIGOS_FICHA = ['2671841', '2627096', '3138270'];
 
-async function procesarFicha(codigo) {
+async function procesarFicha(page, codigo) {
   console.log(`Procesando ficha ${codigo}...`);
-  const archivo = await descargarReporte(codigo);
+  const archivo = await descargarReporte(page, codigo);
   const { total, faltantes, porEvaluar, aprobados } = await obtenerFaltantes(archivo);
 
   console.log(`Ficha ${codigo} - ${porEvaluar} aprendices con juicio pendiente.`);
@@ -45,7 +45,12 @@ async function registrarResultado(codigo, total, porEvaluar, aprobados) {
 }
 
 (async () => {
-  for (const codigo of CODIGOS_FICHA) {
-    await procesarFicha(codigo);
+  const { browser, page } = await iniciarSesion();
+  try {
+    for (const codigo of CODIGOS_FICHA) {
+      await procesarFicha(page, codigo);
+    }
+  } finally {
+    await browser.close();
   }
 })();
