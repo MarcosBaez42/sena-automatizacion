@@ -2,13 +2,9 @@
   "fichas": [
     {
       "codigo": "2671841",
+      "total": 1861,
       "faltantes": 0,
-      "completos": 0
-    },
-    {
-      "codigo": "2627096",
-      "faltantes": 0,
-      "completos": 0
+      "completos": 1861
     }
   ]
 }

@@ -8,17 +8,17 @@ const CODIGOS_FICHA = ['2671841', '2627096', '3138270']; // Fichas a revisar
 async function procesarFicha(codigo) {
   console.log(`Procesando ficha ${codigo}...`);
   const archivo = await descargarReporte(codigo);
-  const faltantes = await obtenerFaltantes(archivo);
+  const { total, faltantes } = await obtenerFaltantes(archivo);
 
   for (const est of faltantes) {
     console.log(`Avisando a ${est.correo}`);
     await enviarAviso(est.correo, est.nombre, codigo);
   }
 
-  await registrarResultado(codigo, faltantes.length);
+  await registrarResultado(codigo, faltantes.length, total);
 }
 
-async function registrarResultado(codigo, faltan) {
+async function registrarResultado(codigo, faltan, total) {
   const DATA_FILE = './data/resultados.json';
   let datos = { fichas: [] };
 
@@ -27,8 +27,7 @@ async function registrarResultado(codigo, faltan) {
     datos = JSON.parse(raw);
   } catch (_) {}
 
-  const total = faltan; // supuesto que no conocemos el total; ajusta según el Excel
-  const entry = { codigo, faltantes: faltan, completos: total - faltan };
+  const entry = { codigo, total, faltantes: faltan, completos: total - faltan };
   datos.fichas = datos.fichas.filter(f => f.codigo !== codigo);
   datos.fichas.push(entry);
 
