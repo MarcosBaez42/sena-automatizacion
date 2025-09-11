@@ -1,6 +1,6 @@
 import { iniciarSesion, descargarReporte } from './loginDownload.js';
 import { obtenerFaltantes } from './parseExcel.js';
-import { enviarAviso } from './sendMail.js';
+// import { notificarInstructor } from './sendMail.js';
 import fs from 'fs/promises';
 
 const CODIGOS_FICHA = ['2671841', '2627096', '3138270'];
@@ -19,9 +19,9 @@ async function procesarFicha(page, codigo) {
     console.log(`- ${est.nombre} (${est.cod})`);
   }
 
-  // Comentar la siguiente línea ya que no se puede enviar el correo sin la dirección
+  // Comentar la siguiente sección ya que no se puede enviar el correo sin la dirección
   // for (const est of faltantes) {
-  //   await enviarAviso(est.correo, est.nombre, codigo);
+  //   await notificarInstructor(est.correo, codigo, est.cod);
   // }
 
   await registrarResultado(codigo, total, porEvaluar, aprobados);

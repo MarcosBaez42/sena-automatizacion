@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Fichas con Juicios Pendientes</title>
+</head>
+<body>
+  <h1>Fichas con Juicios Pendientes</h1>
+  <ul id="lista"></ul>
+  <script>
+    async function cargar() {
+      const res = await fetch('/pendientes');
+      const data = await res.json();
+      const ul = document.getElementById('lista');
+      data.fichas.forEach(f => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = `/descargar/${f}`;
+        a.textContent = `Descargar juicios de ${f}`;
+        li.appendChild(a);
+        ul.appendChild(li);
+      });
+    }
+    cargar();
+  </script>
+</body>
+</html>

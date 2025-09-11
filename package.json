@@ -4,14 +4,27 @@
     "type": "module",
     "scripts": {
         "start": "node src/index.js",
+        "dev": "nodemon src/index.js",
         "stats": "node src/stats.js",
         "evaluar": "node src/cronEvaluaciones.js"
     },
     "dependencies": {
+        "bcryptjs": "^2.4.3",
+        "cors": "^2.8.5",
         "dotenv": "^16.4.0",
         "express": "^4.19.0",
+        "express-validator": "^6.15.0",
         "nodemailer": "^6.9.8",
         "playwright": "^1.42.0",
-        "xlsx": "^0.18.5"
-    }
+        "xlsx": "^0.18.5",
+        "jsonwebtoken": "^9.0.0",
+        "mongoose": "^7.0.1",
+        "morgan": "^1.10.0",
+        "uuid": "^9.0.0"
+    },
+  "devDependencies": {
+    "@types/cors": "^2.8.13",
+    "@types/express": "^4.17.17",
+    "nodemon": "^2.0.22"
+  }
 }

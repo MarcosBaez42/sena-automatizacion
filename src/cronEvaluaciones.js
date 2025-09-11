@@ -1,12 +1,19 @@
 import { iniciarSesion, descargarReporte } from './loginDownload.js';
 import { obtenerFaltantes } from './parseExcel.js';
-import { enviarAviso } from './sendMail.js';
+import { notificarInstructor } from './sendMail.js';
 import { fileURLToPath } from 'url';
+import dbConnection from './database.js';
+import { Schedule } from './models/Schedule.js';
+import { Reporte } from './models/Reporte.js';
 
 const CINCO_DIAS = 5 * 24 * 60 * 60 * 1000;
 
 export async function evaluarSchedulesPendientes({ dbConnection, Schedule, Reporte }) {
-  await dbConnection();
+  const connected = await dbConnection();
+  if (!connected) {
+    console.log('DB not connected, skipping evaluation');
+    return;
+  }
   const limite = new Date(Date.now() - CINCO_DIAS);
   const schedules = await Schedule.find({
     calificado: false,
@@ -40,7 +47,11 @@ export async function evaluarSchedulesPendientes({ dbConnection, Schedule, Repor
           );
 
           if (sched.instructorCorreo) {
-            await enviarAviso(sched.instructorCorreo, ficha, sched._id.toString());
+            await notificarInstructor(
+              sched.instructorCorreo,
+              ficha,
+              sched._id.toString()
+            );
           }
 
           await Reporte.create({
@@ -60,10 +71,6 @@ export async function evaluarSchedulesPendientes({ dbConnection, Schedule, Repor
 const __filename = fileURLToPath(import.meta.url);
 if (process.argv[1] === __filename) {
   (async () => {
-    const backendDir = process.env.BACKEND_DIR || '../backend';
-    const { default: dbConnection } = await import(`${backendDir}/database.js`);
-    const { Schedule } = await import(`${backendDir}/models/Schedule.js`);
-    const { Reporte } = await import(`${backendDir}/models/Reporte.js`);
     await evaluarSchedulesPendientes({ dbConnection, Schedule, Reporte });
     process.exit(0);
   })();

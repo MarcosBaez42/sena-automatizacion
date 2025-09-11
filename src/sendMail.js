@@ -8,11 +8,11 @@ const transporter = nodemailer.createTransport({
   auth: { user: cfg.emailUser, pass: cfg.emailPass }
 });
 
-export async function enviarAviso(destino, nombre, ficha) {
+export async function notificarInstructor(destino, ficha, scheduleId) {
   await transporter.sendMail({
     from: `"Coordinación" <${cfg.emailUser}>`,
     to: destino,
-    subject: `Juicio evaluativo pendiente - Ficha ${ficha}`,
-    text: `Hola ${nombre},\n\nNo encontramos tu juicio evaluativo para la ficha ${ficha}. Por favor revisa en Sofía Plus.\n\nSaludos`
+    subject: `Juicios completados - Ficha ${ficha}`,
+    text: `Se registraron todos los juicios de evaluación para la ficha ${ficha}.\nSchedule: ${scheduleId}.`
   });
 }
