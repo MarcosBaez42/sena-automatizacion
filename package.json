@@ -4,7 +4,8 @@
     "type": "module",
     "scripts": {
         "start": "node src/index.js",
-        "stats": "node src/stats.js"
+        "stats": "node src/stats.js",
+        "evaluar": "node src/cronEvaluaciones.js"
     },
     "dependencies": {
         "dotenv": "^16.4.0",
