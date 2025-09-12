@@ -44,14 +44,22 @@ app.get('/descargar/:ficha', async (req, res) => {
   const { browser, page } = await iniciarSesion();
   try {
     const filePath = await descargarReporte(page, ficha);
-    res.download(path.resolve(filePath), err => {
-      browser.close();
+    res.download(path.resolve(filePath), async err => {
+      try {
+        await browser.close();
+      } catch (closeErr) {
+        console.error('Error cerrando navegador:', closeErr);
+      }
       if (err) {
         console.error('Error enviando archivo:', err);
       }
     });
   } catch (e) {
-    await browser.close();
+    try {
+      await browser.close();
+    } catch (closeErr) {
+      console.error('Error cerrando navegador:', closeErr);
+    }
     res.status(500).json({ error: 'No se pudo descargar el reporte' });
   }
 });

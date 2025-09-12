@@ -53,11 +53,12 @@ export async function obtenerFaltantes(rutaArchivo) {
 
   const codIndex = idxCod > -1 ? idxCod : 0;
   const nombreIndex = idxNombre > -1 ? idxNombre : 1;
+  const juicioIndex = idxJuicio > -1 ? idxJuicio : 2;
 
   for (const row of rows.slice(headerIndex + 1)) {
-    const cod = (row[idxCod] || '').toString().trim();
-    const nombre = (row[idxNombre] || '').toString().trim();
-    const juicio = (row[idxJuicio] || '')
+    const cod = (row[codIndex] || '').toString().trim();
+    const nombre = (row[nombreIndex] || '').toString().trim();
+    const juicio = (row[juicioIndex] || '')
       .toString()
       .trim()
       .toLowerCase();

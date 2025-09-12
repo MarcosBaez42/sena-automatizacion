@@ -3,7 +3,6 @@ import { Schedule } from './models/Schedule.js';
 import { ReporteDiario } from './models/ReporteDiario.js';
 import { descargarJuicios, enviarCorreo } from './stubs.js';
 import { fileURLToPath } from 'url';
-import { createRequire } from 'module';
 
 /**
  * Dependencias externas proporcionadas por Repfora.
@@ -85,7 +84,6 @@ export async function procesarSchedule(schedule) {
  * @returns {Promise<void>} Promesa resuelta al finalizar.
  */
 export async function main() {
-  process.env.MONGO_URL = process.env.SOFIA_TEST_URI;
   // TODO Repfora
   console.log('Estableciendo conexión a la base de datos...');
   const connected = await dbConnection();
@@ -108,9 +106,6 @@ export async function main() {
   }
 }
 
-const require = createRequire(import.meta.url);
-const __filename = fileURLToPath(import.meta.url);
-const isMain = (typeof module !== 'undefined' && require.main === module) || require.main?.filename === __filename;
-if (isMain) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   main().then(() => process.exit(0));
 }

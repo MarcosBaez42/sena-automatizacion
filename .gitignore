@@ -201,3 +201,5 @@ $RECYCLE.BIN/
 Pruebas-bugs/utils/uploadFiles/*.json
 *.key.json
 *.gcp.json
+# Local database dumps
+dump/

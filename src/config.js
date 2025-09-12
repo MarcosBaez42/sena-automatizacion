@@ -7,5 +7,10 @@ export const cfg = {
   emailPass: process.env.EMAIL_PASS,
   smtpHost: process.env.SMTP_HOST,
   smtpPort: process.env.SMTP_PORT || 587,
-  outputDir: './downloads'
+  outputDir: './downloads',
+  codigosFicha: (process.env.CODIGOS_FICHA || '')
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean),
+  mailEnabled: process.env.MAIL_ENABLED === 'true'
 };
