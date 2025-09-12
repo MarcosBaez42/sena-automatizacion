@@ -85,7 +85,6 @@ export async function procesarSchedule(schedule) {
  * @returns {Promise<void>} Promesa resuelta al finalizar.
  */
 export async function main() {
-  process.env.MONGO_URL = process.env.SOFIA_TEST_URI;
   // TODO Repfora
   console.log('Estableciendo conexión a la base de datos...');
   const connected = await dbConnection();
