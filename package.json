@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "type": "module",
     "scripts": {
-        "start": "node src/index.js",
+        "start": "node src/processSchedules.js",
         "dev": "nodemon src/index.js",
         "stats": "node src/stats.js",
         "evaluar": "node src/cronEvaluaciones.js"
