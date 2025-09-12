@@ -1,9 +1,8 @@
 import { iniciarSesion, descargarReporte } from './loginDownload.js';
 import { obtenerFaltantes } from './parseExcel.js';
-// import { notificarInstructor } from './sendMail.js';
+import { notificarInstructor } from './sendMail.js';
+import { cfg } from './config.js';
 import fs from 'fs/promises';
-
-const CODIGOS_FICHA = ['2671841', '2627096', '3138270'];
 
 async function procesarFicha(page, codigo) {
   console.log(`Procesando ficha ${codigo}...`);
@@ -12,17 +11,16 @@ async function procesarFicha(page, codigo) {
 
   console.log(`Ficha ${codigo} - ${porEvaluar} aprendices con juicio pendiente.`);
   
-  // Como el archivo .xls no tiene correo, no se pueden enviar los avisos.
-  // Se imprime en consola la lista de aprendices por evaluar.
   console.log('Aprendices con juicio pendiente:');
   for (const est of faltantes) {
     console.log(`- ${est.nombre} (${est.cod})`);
   }
 
-  // Comentar la siguiente sección ya que no se puede enviar el correo sin la dirección
-  // for (const est of faltantes) {
-  //   await notificarInstructor(est.correo, codigo, est.cod);
-  // }
+  if (cfg.mailEnabled) {
+    for (const est of faltantes) {
+      await notificarInstructor(est.correo, codigo, est.cod);
+    }
+  }
 
   await registrarResultado(codigo, total, porEvaluar, aprobados);
 }
@@ -47,7 +45,7 @@ async function registrarResultado(codigo, total, porEvaluar, aprobados) {
 (async () => {
   const { browser, page } = await iniciarSesion();
   try {
-    for (const codigo of CODIGOS_FICHA) {
+    for (const codigo of cfg.codigosFicha) {
       await procesarFicha(page, codigo);
     }
   } finally {
