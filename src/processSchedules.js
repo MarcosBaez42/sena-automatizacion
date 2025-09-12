@@ -67,6 +67,7 @@ export async function procesarSchedule(schedule) {
   if (juicios.calificado) {
     const fecha = new Date();
     await actualizarSchedule(schedule, fecha);
+    console.log(`Schedule ${schedule._id} marcado como calificado.`);
     if (schedule.instructorCorreo) {
       // TODO Repfora
       await enviarCorreo(schedule.instructorCorreo, {
@@ -74,6 +75,8 @@ export async function procesarSchedule(schedule) {
         fechaCalificacion: fecha
       });
     }
+  } else {
+    console.log(`Schedule ${schedule._id} sin calificar.`);
   }
 }
 
@@ -84,9 +87,20 @@ export async function procesarSchedule(schedule) {
 export async function main() {
   process.env.MONGO_URL = process.env.SOFIA_TEST_URI;
   // TODO Repfora
+  console.log('Estableciendo conexión a la base de datos...');
   const connected = await dbConnection();
-  if (!connected) return;
+  if (!connected) {
+    console.log('No se pudo establecer la conexión.');
+    return;
+  }
+  console.log('Conexión establecida.');
   const pendientes = await obtenerSchedulesPendientes();
+  const total = Object.values(pendientes).reduce((acc, group) => acc + group.length, 0);
+  if (total === 0) {
+    console.log('No hay schedules pendientes.');
+    return;
+  }
+  console.log(`Procesando ${total} schedules.`);
   for (const group of Object.values(pendientes)) {
     for (const sched of group) {
       await procesarSchedule(sched);
