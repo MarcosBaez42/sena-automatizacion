@@ -4,7 +4,9 @@ import { cfg } from './config.js';
 import path from 'path';
 
 export async function iniciarSesion() {
-    const browser = await chromium.launch({ headless: false, slowMo: 100 });
+    const headless = process.env.HEADLESS ? process.env.HEADLESS === 'true' : false;
+    const slowMo = process.env.SLOWMO ? parseInt(process.env.SLOWMO, 10) : 100;
+    const browser = await chromium.launch({ headless, slowMo });
     const page = await browser.newPage();
 
     await page.goto('http://senasofiaplus.edu.co/sofia-public/');
@@ -12,6 +14,9 @@ export async function iniciarSesion() {
     await page.waitForSelector('#registradoBox1', { timeout: 60000 });
 
     const fh = await page.$('#registradoBox1');
+    if (!fh) {
+        throw new Error('No se encontró el frame de login (#registradoBox1)');
+    }
     const loginFrame = await fh.contentFrame();
     await loginFrame.waitForSelector('input#username');
     await loginFrame.getByRole('textbox', { name: 'Número de Documento' }).fill(cfg.sofiaUser);
