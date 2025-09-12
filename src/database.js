@@ -4,9 +4,9 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 const dbConnection = async () => {
-  const uri = process.env.MONGO_URL;
+  const uri = process.env.SOFIA_TEST_URI;
   if (!uri) {
-    console.log("MONGO_URL not set, skipping DB connection");
+    console.log("SOFIA_TEST_URI not set, skipping DB connection");
     return false;
   }
   try {
