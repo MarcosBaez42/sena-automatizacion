@@ -4,11 +4,11 @@ import { notificarInstructor } from './sendMail.js';
 import { fileURLToPath } from 'url';
 import dbConnection from './database.js';
 import { Schedule } from './models/Schedule.js';
-import { Reporte } from './models/Reporte.js';
+import { ReporteDiario } from './models/ReporteDiario.js';
 
 const CINCO_DIAS = 5 * 24 * 60 * 60 * 1000;
 
-export async function evaluarSchedulesPendientes({ dbConnection, Schedule, Reporte }) {
+export async function evaluarSchedulesPendientes({ dbConnection, Schedule, ReporteDiario }) {
   const connected = await dbConnection();
   if (!connected) {
     console.log('DB not connected, skipping evaluation');
@@ -54,8 +54,8 @@ export async function evaluarSchedulesPendientes({ dbConnection, Schedule, Repor
             );
           }
 
-          await Reporte.create({
-            fecha: new Date(),
+          await ReporteDiario.create({
+            fechaCalificacion: new Date(),
             scheduleId: sched._id,
             ficha,
             info: { total, porEvaluar, aprobados, faltantes }
@@ -71,7 +71,7 @@ export async function evaluarSchedulesPendientes({ dbConnection, Schedule, Repor
 const __filename = fileURLToPath(import.meta.url);
 if (process.argv[1] === __filename) {
   (async () => {
-    await evaluarSchedulesPendientes({ dbConnection, Schedule, Reporte });
+    await evaluarSchedulesPendientes({ dbConnection, Schedule, ReporteDiario });
     process.exit(0);
   })();
 }

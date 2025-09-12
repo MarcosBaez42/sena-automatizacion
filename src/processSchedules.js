@@ -1,20 +1,11 @@
 import dbConnection from './database.js';
 import { Schedule } from './models/Schedule.js';
-import { Schema, model } from 'mongoose';
+import { ReporteDiario } from './models/ReporteDiario.js';
 import { descargarJuicios, enviarCorreo } from './stubs.js';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 
 const CINCO_DIAS = 5 * 24 * 60 * 60 * 1000;
-
-const reporteDiarioSchema = new Schema({
-  fecha: { type: Date, default: Date.now },
-  scheduleId: { type: Schema.Types.ObjectId, ref: 'Schedule' },
-  ficha: String,
-  datos: Schema.Types.Mixed
-});
-
-const ReporteDiario = model('ReporteDiario', reporteDiarioSchema, 'reportes_diarios');
 
 /**
  * Obtiene los schedules pendientes agrupados por ficha.
@@ -45,10 +36,10 @@ export async function actualizarSchedule(schedule, fechaCalificacion) {
     { $set: { calificado: true, fechaCalificacion } }
   );
   await ReporteDiario.create({
-    fecha: fechaCalificacion,
+    fechaCalificacion,
     scheduleId: schedule._id,
     ficha: schedule.ficha,
-    datos: {}
+    info: {}
   });
 }
 
