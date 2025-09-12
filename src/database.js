@@ -7,9 +7,9 @@ const MAX_RETRIES = parseInt(process.env.DB_MAX_RETRIES ?? "3", 10);
 const RETRY_DELAY_MS = parseInt(process.env.DB_RETRY_DELAY_MS ?? "5000", 10);
 
 const dbConnection = async () => {
-  const uri = process.env.SOFIA_TEST_URI;
+  const uri = process.env.SOFIA_TEST_URI || process.env.MONGO_URL;
   if (!uri) {
-    console.log("SOFIA_TEST_URI not set, skipping DB connection");
+    console.log("Database URI not set, skipping DB connection");
     return false;
   }
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
