@@ -5,6 +5,16 @@ import { descargarJuicios, enviarCorreo } from './stubs.js';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 
+/**
+ * Dependencias externas proporcionadas por Repfora.
+ * @typedef {Object} RepforaDependencies
+ * @property {Function} dbConnection - Manejador de conexión a la base de datos.
+ * @property {typeof Schedule} Schedule - Modelo de schedule.
+ * @property {typeof ReporteDiario} ReporteDiario - Modelo para reportes diarios.
+ * @property {Function} descargarJuicios - Servicio para obtener juicios de un schedule.
+ * @property {Function} enviarCorreo - Servicio para enviar notificaciones por correo.
+ */
+
 const CINCO_DIAS = 5 * 24 * 60 * 60 * 1000;
 
 /**
@@ -13,6 +23,7 @@ const CINCO_DIAS = 5 * 24 * 60 * 60 * 1000;
  */
 export async function obtenerSchedulesPendientes() {
   const limite = new Date(Date.now() - CINCO_DIAS);
+  // TODO Repfora
   const schedules = await Schedule.find({
     calificado: false,
     fend: { $lt: limite }
@@ -31,10 +42,12 @@ export async function obtenerSchedulesPendientes() {
  * @returns {Promise<void>} Promesa resuelta al finalizar.
  */
 export async function actualizarSchedule(schedule, fechaCalificacion) {
+  // TODO Repfora
   await Schedule.updateOne(
     { _id: schedule._id },
     { $set: { calificado: true, fechaCalificacion } }
   );
+  // TODO Repfora
   await ReporteDiario.create({
     fechaCalificacion,
     scheduleId: schedule._id,
@@ -49,11 +62,13 @@ export async function actualizarSchedule(schedule, fechaCalificacion) {
  * @returns {Promise<void>} Promesa resuelta al finalizar.
  */
 export async function procesarSchedule(schedule) {
+  // TODO Repfora
   const juicios = await descargarJuicios(schedule);
   if (juicios.calificado) {
     const fecha = new Date();
     await actualizarSchedule(schedule, fecha);
     if (schedule.instructorCorreo) {
+      // TODO Repfora
       await enviarCorreo(schedule.instructorCorreo, {
         scheduleId: schedule._id,
         fechaCalificacion: fecha
@@ -68,6 +83,7 @@ export async function procesarSchedule(schedule) {
  */
 export async function main() {
   process.env.MONGO_URL = process.env.SOFIA_TEST_URI;
+  // TODO Repfora
   const connected = await dbConnection();
   if (!connected) return;
   const pendientes = await obtenerSchedulesPendientes();
