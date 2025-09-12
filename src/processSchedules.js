@@ -14,18 +14,17 @@ import { fileURLToPath } from 'url';
  * @property {Function} enviarCorreo - Servicio para enviar notificaciones por correo.
  */
 
-const CINCO_DIAS = 5 * 24 * 60 * 60 * 1000;
-
 /**
  * Obtiene los schedules pendientes agrupados por ficha.
  * @returns {Promise<Record<string, any[]>>} Schedules pendientes agrupados.
  */
 export async function obtenerSchedulesPendientes() {
-  const limite = new Date(Date.now() - CINCO_DIAS);
   // TODO Repfora
   const schedules = await Schedule.find({
-    calificado: false,
-    fend: { $lt: limite }
+    $or: [
+      { calificado: { $exists: false } },
+      { calificado: false }
+    ]
   }).lean();
   return schedules.reduce((acc, sched) => {
     acc[sched.ficha] = acc[sched.ficha] || [];

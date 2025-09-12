@@ -6,18 +6,17 @@ import dbConnection from './database.js';
 import { Schedule } from './models/Schedule.js';
 import { ReporteDiario } from './models/ReporteDiario.js';
 
-const CINCO_DIAS = 5 * 24 * 60 * 60 * 1000;
-
 export async function evaluarSchedulesPendientes({ dbConnection, Schedule, ReporteDiario }) {
   const connected = await dbConnection();
   if (!connected) {
     console.log('DB not connected, skipping evaluation');
     return;
   }
-  const limite = new Date(Date.now() - CINCO_DIAS);
   const schedules = await Schedule.find({
-    calificado: false,
-    fend: { $lt: limite }
+    $or: [
+      { calificado: { $exists: false } },
+      { calificado: false }
+    ]
   }).lean();
 
   const schedulesPorFicha = schedules.reduce((acc, sched) => {
