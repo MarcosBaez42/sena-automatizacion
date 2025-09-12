@@ -1,7 +1,8 @@
 import dbConnection from './database.js';
 import { Schedule } from './models/Schedule.js';
 import { ReporteDiario } from './models/ReporteDiario.js';
-import { descargarJuicios, enviarCorreo } from './stubs.js';
+import { descargarJuicios } from './stubs.js';
+import { enviarCorreo } from './sendMail.js';
 import { fileURLToPath } from 'url';
 
 /**
@@ -61,8 +62,8 @@ export async function actualizarSchedule(schedule, fechaCalificacion) {
  */
 export async function procesarSchedule(schedule) {
   // TODO Repfora
-  const juicios = await descargarJuicios(schedule);
-  if (juicios.calificado) {
+  const { calificado } = await descargarJuicios(schedule);
+  if (calificado) {
     const fecha = new Date();
     await actualizarSchedule(schedule, fecha);
     console.log(`Schedule ${schedule._id} marcado como calificado.`);

@@ -1,31 +1,15 @@
-/**
- * Almacén temporal en memoria para juicios por schedule.
- * @type {Map<string, {calificado: boolean, datos?: any}>}
- */
-const juiciosMemoria = new Map();
+import { cfg } from './config.js';
 
 /**
- * Descarga los juicios de un schedule. Mantiene los datos solo en memoria.
- * Registra "pendiente" en consola cuando no hay calificación.
+ * Consulta el servicio externo que provee los juicios para un schedule.
  * @param {Object} schedule - Documento del schedule a consultar.
- * @returns {Promise<{calificado: boolean, datos?: any}>} Juicios del schedule.
+ * @returns {Promise<any>} Respuesta del servicio de juicios.
  */
 export async function descargarJuicios(schedule) {
-  const info = juiciosMemoria.get(schedule._id?.toString());
-  if (!info?.calificado) {
-    console.log('pendiente');
+  const url = `${cfg.juiciosApiUrl}/schedules/${schedule._id}/juicios`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Error al obtener juicios: ${res.status} ${res.statusText}`);
   }
-  return info ?? { calificado: false };
+  return await res.json();
 }
-
-/**
- * Envía un correo al instructor con información de calificación.
- * @param {string} instructor - Correo del instructor.
- * @param {Object} datos - Datos adicionales para el mensaje.
- * @returns {Promise<void>} Promesa resuelta al finalizar.
- */
-export async function enviarCorreo(instructor, datos) {
-  console.log(`Correo a ${instructor}:`, datos);
-}
-
-export { juiciosMemoria };
