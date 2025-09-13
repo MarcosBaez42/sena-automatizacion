@@ -1,7 +1,8 @@
 import dbConnection from './database.js';
 import { Schedule } from './models/Schedule.js';
 import { ReporteDiario } from './models/ReporteDiario.js';
-import { descargarJuicios, enviarCorreo } from './stubs.js';
+import { descargarJuicios } from './stubs.js';
+import { enviarCorreo } from './sendMail.js';
 import { fileURLToPath } from 'url';
 
 /**
@@ -14,18 +15,17 @@ import { fileURLToPath } from 'url';
  * @property {Function} enviarCorreo - Servicio para enviar notificaciones por correo.
  */
 
-const CINCO_DIAS = 5 * 24 * 60 * 60 * 1000;
-
 /**
  * Obtiene los schedules pendientes agrupados por ficha.
  * @returns {Promise<Record<string, any[]>>} Schedules pendientes agrupados.
  */
 export async function obtenerSchedulesPendientes() {
-  const limite = new Date(Date.now() - CINCO_DIAS);
   // TODO Repfora
   const schedules = await Schedule.find({
-    calificado: false,
-    fend: { $lt: limite }
+    $or: [
+      { calificado: { $exists: false } },
+      { calificado: false }
+    ]
   }).lean();
   return schedules.reduce((acc, sched) => {
     acc[sched.ficha] = acc[sched.ficha] || [];
@@ -62,8 +62,8 @@ export async function actualizarSchedule(schedule, fechaCalificacion) {
  */
 export async function procesarSchedule(schedule) {
   // TODO Repfora
-  const juicios = await descargarJuicios(schedule);
-  if (juicios.calificado) {
+  const { calificado } = await descargarJuicios(schedule);
+  if (calificado) {
     const fecha = new Date();
     await actualizarSchedule(schedule, fecha);
     console.log(`Schedule ${schedule._id} marcado como calificado.`);

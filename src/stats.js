@@ -10,7 +10,6 @@ const PORT = 3000;
 
 // Supón que guardas los resultados de cada ficha en JSON:
 const DATA_FILE = './data/resultados.json';
-const CINCO_DIAS = 5 * 24 * 60 * 60 * 1000;
 
 app.use(express.static('public'));
 
@@ -27,10 +26,11 @@ app.get('/pendientes', async (_req, res) => {
   try {
     const connected = await dbConnection();
     if (!connected) return res.json({ fichas: [] });
-    const limite = new Date(Date.now() - CINCO_DIAS);
     const schedules = await Schedule.find({
-      calificado: false,
-      fend: { $lt: limite }
+      $or: [
+        { calificado: { $exists: false } },
+        { calificado: false }
+      ]
     }).lean();
     const fichas = [...new Set(schedules.map(s => s.ficha))];
     res.json({ fichas });
