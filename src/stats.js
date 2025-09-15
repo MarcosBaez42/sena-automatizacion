@@ -34,8 +34,11 @@ app.get('/pendientes', async (_req, res) => {
     })
       .populate('ficha', 'number')
       .lean();
-    const fichas = [...new Set(schedules.map(s => s.ficha.number))];
-    res.json({ fichas });
+    const fichas = schedules
+      .filter(sched => sched?.ficha?.number)
+      .reduce((set, sched) => set.add(sched.ficha.number), new Set());
+
+    res.json({ fichas: [...fichas] });
   } catch (err) {
     res.json({ fichas: [] });
   }

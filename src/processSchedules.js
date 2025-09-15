@@ -29,16 +29,14 @@ export async function obtenerSchedulesPendientes() {
   })
     .populate('ficha', 'number')
     .lean();
-  return schedules.reduce((acc, sched) => {
-    if (!sched.ficha || !sched.ficha.number) {
-      console.warn(`Schedule ${sched._id} sin ficha asociada`);
+  return schedules
+    .filter(sched => sched?.ficha?.number)
+    .reduce((acc, sched) => {
+      const numero = sched.ficha.number;
+      acc[numero] = acc[numero] || [];
+      acc[numero].push(sched);
       return acc;
-    }
-    const numero = sched.ficha.number;
-    acc[numero] = acc[numero] || [];
-    acc[numero].push(sched);
-    return acc;
-  }, {});
+    }, {});
 }
 
 /**
@@ -49,10 +47,7 @@ export async function obtenerSchedulesPendientes() {
  */
 export async function actualizarSchedule(schedule, fechaCalificacion) {
   // TODO Repfora
-  if (!schedule.ficha || !schedule.ficha.number) {
-    console.warn(`Schedule ${schedule._id} sin ficha asociada`);
-    return;
-  }
+  if (!schedule?.ficha?.number) return;
   await Schedule.updateOne(
     { _id: schedule._id },
     { $set: { calificado: true, fechaCalificacion } }
@@ -77,7 +72,7 @@ export async function procesarSchedule(schedule) {
     console.warn(`Schedule ${schedule._id} sin ficha asociada`);
     return;
   }
-  const { calificado } = await descargarJuicios({
+  const { calificado, porEvaluar, tienePendientes } = await descargarJuicios({
     ...schedule,
     ficha: schedule.ficha.number
   });
@@ -93,7 +88,35 @@ export async function procesarSchedule(schedule) {
       });
     }
   } else {
-    console.log(`Schedule ${schedule._id} sin calificar.`);
+    const pendientes = typeof porEvaluar === 'number'
+      ? porEvaluar > 0
+      : typeof tienePendientes === 'boolean'
+        ? tienePendientes
+        : undefined;
+
+    if (typeof porEvaluar === 'number') {
+      if (porEvaluar > 0) {
+        console.log(
+          `Schedule ${schedule._id} sin calificar. Juicios pendientes: ${porEvaluar}.`
+        );
+      } else {
+        console.log(
+          `Schedule ${schedule._id} sin calificar. Sin juicios de evaluación pendientes.`
+        );
+      }
+    } else if (pendientes === true) {
+      console.log(
+        `Schedule ${schedule._id} sin calificar. Tiene juicios de evaluación pendientes.`
+      );
+    } else if (pendientes === false) {
+      console.log(
+        `Schedule ${schedule._id} sin calificar. No tiene juicios de evaluación pendientes.`
+      );
+    } else {
+      console.log(
+        `Schedule ${schedule._id} sin calificar. No se pudo determinar si tiene juicios de evaluación pendientes.`
+      );
+    }
   }
 }
 
