@@ -28,8 +28,8 @@ export async function obtenerSchedulesPendientes() {
     ]
   }).lean();
   return schedules.reduce((acc, sched) => {
-    acc[sched.ficha] = acc[sched.ficha] || [];
-    acc[sched.ficha].push(sched);
+    acc[sched.fiche] = acc[sched.fiche] || [];
+    acc[sched.fiche].push(sched);
     return acc;
   }, {});
 }
@@ -50,7 +50,7 @@ export async function actualizarSchedule(schedule, fechaCalificacion) {
   await ReporteDiario.create({
     fechaCalificacion,
     scheduleId: schedule._id,
-    ficha: schedule.ficha,
+    ficha: schedule.fiche,
     info: {}
   });
 }

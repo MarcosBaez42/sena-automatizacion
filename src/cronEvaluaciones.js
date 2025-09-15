@@ -20,8 +20,8 @@ export async function evaluarSchedulesPendientes({ dbConnection, Schedule, Repor
   }).lean();
 
   const schedulesPorFicha = schedules.reduce((acc, sched) => {
-    acc[sched.ficha] = acc[sched.ficha] || [];
-    acc[sched.ficha].push(sched);
+    acc[sched.fiche] = acc[sched.fiche] || [];
+    acc[sched.fiche].push(sched);
     return acc;
   }, {});
 

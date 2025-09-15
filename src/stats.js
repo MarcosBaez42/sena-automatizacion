@@ -32,7 +32,7 @@ app.get('/pendientes', async (_req, res) => {
         { calificado: false }
       ]
     }).lean();
-    const fichas = [...new Set(schedules.map(s => s.ficha))];
+    const fichas = [...new Set(schedules.map(s => s.fiche))];
     res.json({ fichas });
   } catch (err) {
     res.json({ fichas: [] });

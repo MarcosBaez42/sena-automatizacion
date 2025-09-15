@@ -19,7 +19,7 @@ export async function descargarJuicios(schedule) {
     return await res.json();
   }
 
-  if (!schedule.ficha) {
+  if (!schedule.fiche) {
     console.warn(`Schedule ${schedule._id} no tiene ficha definida`);
     return { calificado: false };
   }
@@ -28,7 +28,7 @@ export async function descargarJuicios(schedule) {
     session = await iniciarSesion();
   }
 
-  const filePath = await descargarReporte(session.page, schedule.ficha);
+  const filePath = await descargarReporte(session.page, schedule.fiche);
   const { porEvaluar } = await obtenerFaltantes(filePath);
   return { calificado: porEvaluar === 0 };
 }
