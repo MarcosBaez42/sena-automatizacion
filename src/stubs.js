@@ -16,12 +16,20 @@ export async function descargarJuicios(schedule) {
     if (!res.ok) {
       throw new Error(`Error al obtener juicios: ${res.status} ${res.statusText}`);
     }
-    return await res.json();
+    const data = await res.json();
+    if (typeof data.tienePendientes !== 'boolean') {
+      if (typeof data.porEvaluar === 'number') {
+        data.tienePendientes = data.porEvaluar > 0;
+      } else if (typeof data.calificado === 'boolean') {
+        data.tienePendientes = !data.calificado;
+      }
+    }
+    return data;
   }
 
   if (!schedule.fiche) {
     console.warn(`Schedule ${schedule._id} no tiene ficha definida`);
-    return { calificado: false };
+    return { calificado: false, porEvaluar: null, tienePendientes: null };
   }
 
   if (!session) {
@@ -37,6 +45,14 @@ export async function descargarJuicios(schedule) {
   }
 
   const filePath = await descargarReporte(session.page, ficha);
-  const { porEvaluar } = await obtenerFaltantes(filePath);
-  return { calificado: porEvaluar === 0 };
+  const { porEvaluar, total, faltantes, aprobados } = await obtenerFaltantes(filePath);
+  const calificado = porEvaluar === 0;
+  return {
+    calificado,
+    porEvaluar,
+    total,
+    aprobados,
+    faltantes,
+    tienePendientes: !calificado
+  };
 }
