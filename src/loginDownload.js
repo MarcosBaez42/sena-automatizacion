@@ -49,7 +49,7 @@ export async function descargarReporte(page, codigoFicha) {
         const modalFrame = await modalHandle.contentFrame();
         await modalFrame.waitForSelector('input[id$="codigoFichaITX"]', { timeout: 60000 });
 
-        await modalFrame.fill('input[id$="codigoFichaITX"]', codigoFicha);
+        await modalFrame.fill('input[id$="codigoFichaITX"]', String(codigoFicha));
         await modalFrame.getByRole('button', { name: 'Consultar' }).click();
         await modalFrame.waitForSelector('table[id$="dtFichas"] tbody tr');
         const firstRow = modalFrame.locator('table[id$="dtFichas"] tbody tr').first();

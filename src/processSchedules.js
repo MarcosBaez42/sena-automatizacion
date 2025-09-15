@@ -26,10 +26,13 @@ export async function obtenerSchedulesPendientes() {
       { calificado: { $exists: false } },
       { calificado: false }
     ]
-  }).lean();
+  })
+    .populate('ficha', 'number')
+    .lean();
   return schedules.reduce((acc, sched) => {
-    acc[sched.ficha] = acc[sched.ficha] || [];
-    acc[sched.ficha].push(sched);
+    const numero = sched.ficha.number;
+    acc[numero] = acc[numero] || [];
+    acc[numero].push(sched);
     return acc;
   }, {});
 }
@@ -50,7 +53,7 @@ export async function actualizarSchedule(schedule, fechaCalificacion) {
   await ReporteDiario.create({
     fechaCalificacion,
     scheduleId: schedule._id,
-    ficha: schedule.ficha,
+    ficha: schedule.ficha.number,
     info: {}
   });
 }
@@ -62,7 +65,10 @@ export async function actualizarSchedule(schedule, fechaCalificacion) {
  */
 export async function procesarSchedule(schedule) {
   // TODO Repfora
-  const { calificado } = await descargarJuicios(schedule);
+  const { calificado } = await descargarJuicios({
+    ...schedule,
+    ficha: schedule.ficha.number
+  });
   if (calificado) {
     const fecha = new Date();
     await actualizarSchedule(schedule, fecha);

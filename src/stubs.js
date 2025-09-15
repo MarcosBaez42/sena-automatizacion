@@ -19,15 +19,24 @@ export async function descargarJuicios(schedule) {
     return await res.json();
   }
 
+  if (!schedule.fiche) {
+    console.warn(`Schedule ${schedule._id} no tiene ficha definida`);
+    return { calificado: false };
+  }
+
   if (!session) {
     session = await iniciarSesion();
   }
 
-  if (!schedule.ficha) {
+  const ficha = typeof schedule.ficha === 'object'
+    ? schedule.ficha.number
+    : schedule.ficha;
+
+  if (!ficha) {
     throw new Error(`Schedule ${schedule._id} no tiene ficha definida`);
   }
 
-  const filePath = await descargarReporte(session.page, schedule.ficha);
+  const filePath = await descargarReporte(session.page, ficha);
   const { porEvaluar } = await obtenerFaltantes(filePath);
   return { calificado: porEvaluar === 0 };
 }
