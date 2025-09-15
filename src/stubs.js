@@ -27,8 +27,8 @@ export async function descargarJuicios(schedule) {
     return data;
   }
 
-  if (!schedule.fiche) {
-    console.warn(`Schedule ${schedule._id} no tiene ficha definida`);
+  if (!schedule.ficha) {
+    console.warn(`Schedule ${schedule._id} no tiene schedule.ficha definida`);
     return { calificado: false, porEvaluar: null, tienePendientes: null };
   }
 
