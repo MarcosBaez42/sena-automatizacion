@@ -25,10 +25,7 @@ const SCHEDULES_SIN_FICHA_KEY = '__sinFicha__';
 export async function obtenerSchedulesPendientes() {
   // TODO Repfora
   const schedules = await Schedule.find({
-    $or: [
-      { calificado: { $exists: false } },
-      { calificado: false }
-    ]
+    calificado: { $ne: true }
   })
     .populate('ficha', 'number')
     .lean();

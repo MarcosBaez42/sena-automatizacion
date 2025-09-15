@@ -13,10 +13,7 @@ export async function evaluarSchedulesPendientes({ dbConnection, Schedule, Repor
     return;
   }
   const schedules = await Schedule.find({
-    $or: [
-      { calificado: { $exists: false } },
-      { calificado: false }
-    ]
+    calificado: { $ne: true }
   })
     .populate('ficha', 'number')
     .lean();
