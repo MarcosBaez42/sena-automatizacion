@@ -27,10 +27,7 @@ app.get('/pendientes', async (_req, res) => {
     const connected = await dbConnection();
     if (!connected) return res.json({ fichas: [] });
     const schedules = await Schedule.find({
-      $or: [
-        { calificado: { $exists: false } },
-        { calificado: false }
-      ]
+      calificado: { $ne: true }
     })
       .populate('ficha', 'number')
       .lean();
