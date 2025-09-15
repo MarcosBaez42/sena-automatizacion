@@ -31,8 +31,10 @@ app.get('/pendientes', async (_req, res) => {
         { calificado: { $exists: false } },
         { calificado: false }
       ]
-    }).lean();
-    const fichas = [...new Set(schedules.map(s => s.fiche))];
+    })
+      .populate('ficha', 'number')
+      .lean();
+    const fichas = [...new Set(schedules.map(s => s.ficha.number))];
     res.json({ fichas });
   } catch (err) {
     res.json({ fichas: [] });

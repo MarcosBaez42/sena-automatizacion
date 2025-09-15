@@ -28,8 +28,15 @@ export async function descargarJuicios(schedule) {
     session = await iniciarSesion();
   }
 
-  const codigoFicha = schedule.fiche.toString();
-  const filePath = await descargarReporte(session.page, codigoFicha);
+  const ficha = typeof schedule.ficha === 'object'
+    ? schedule.ficha.number
+    : schedule.ficha;
+
+  if (!ficha) {
+    throw new Error(`Schedule ${schedule._id} no tiene ficha definida`);
+  }
+
+  const filePath = await descargarReporte(session.page, ficha);
   const { porEvaluar } = await obtenerFaltantes(filePath);
   return { calificado: porEvaluar === 0 };
 }

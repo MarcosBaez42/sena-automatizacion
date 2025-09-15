@@ -17,11 +17,14 @@ export async function evaluarSchedulesPendientes({ dbConnection, Schedule, Repor
       { calificado: { $exists: false } },
       { calificado: false }
     ]
-  }).lean();
+  })
+    .populate('ficha', 'number')
+    .lean();
 
   const schedulesPorFicha = schedules.reduce((acc, sched) => {
-    acc[sched.fiche] = acc[sched.fiche] || [];
-    acc[sched.fiche].push(sched);
+    const numeroFicha = sched.ficha.number;
+    acc[numeroFicha] = acc[numeroFicha] || [];
+    acc[numeroFicha].push(sched);
     return acc;
   }, {});
 
