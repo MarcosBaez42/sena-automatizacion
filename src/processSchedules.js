@@ -30,6 +30,10 @@ export async function obtenerSchedulesPendientes() {
     .populate('ficha', 'number')
     .lean();
   return schedules.reduce((acc, sched) => {
+    if (!sched.ficha || !sched.ficha.number) {
+      console.warn(`Schedule ${sched._id} sin ficha asociada`);
+      return acc;
+    }
     const numero = sched.ficha.number;
     acc[numero] = acc[numero] || [];
     acc[numero].push(sched);
@@ -45,6 +49,10 @@ export async function obtenerSchedulesPendientes() {
  */
 export async function actualizarSchedule(schedule, fechaCalificacion) {
   // TODO Repfora
+  if (!schedule.ficha || !schedule.ficha.number) {
+    console.warn(`Schedule ${schedule._id} sin ficha asociada`);
+    return;
+  }
   await Schedule.updateOne(
     { _id: schedule._id },
     { $set: { calificado: true, fechaCalificacion } }
@@ -65,6 +73,10 @@ export async function actualizarSchedule(schedule, fechaCalificacion) {
  */
 export async function procesarSchedule(schedule) {
   // TODO Repfora
+  if (!schedule.ficha || !schedule.ficha.number) {
+    console.warn(`Schedule ${schedule._id} sin ficha asociada`);
+    return;
+  }
   const { calificado } = await descargarJuicios({
     ...schedule,
     ficha: schedule.ficha.number
