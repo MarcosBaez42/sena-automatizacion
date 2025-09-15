@@ -19,12 +19,13 @@ export async function descargarJuicios(schedule) {
     return await res.json();
   }
 
-  if (!session) {
-    session = await iniciarSesion();
+  if (!schedule.ficha) {
+    console.warn(`Schedule ${schedule._id} no tiene ficha definida`);
+    return { calificado: false };
   }
 
-  if (!schedule.ficha) {
-    throw new Error(`Schedule ${schedule._id} no tiene ficha definida`);
+  if (!session) {
+    session = await iniciarSesion();
   }
 
   const filePath = await descargarReporte(session.page, schedule.ficha);
