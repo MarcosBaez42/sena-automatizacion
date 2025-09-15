@@ -5,6 +5,8 @@ import { descargarJuicios } from './stubs.js';
 import { enviarCorreo } from './sendMail.js';
 import { fileURLToPath } from 'url';
 
+const SCHEDULES_SIN_FICHA_KEY = '__sinFicha__';
+
 /**
  * Dependencias externas proporcionadas por Repfora.
  * @typedef {Object} RepforaDependencies
@@ -17,7 +19,8 @@ import { fileURLToPath } from 'url';
 
 /**
  * Obtiene los schedules pendientes agrupados por ficha.
- * @returns {Promise<Record<string, any[]>>} Schedules pendientes agrupados.
+ * @returns {Promise<Record<string, any[]>>} Schedules pendientes agrupados. Los que no
+ * tienen ficha.number se registran bajo la clave definida en SCHEDULES_SIN_FICHA_KEY.
  */
 export async function obtenerSchedulesPendientes() {
   // TODO Repfora
@@ -29,14 +32,27 @@ export async function obtenerSchedulesPendientes() {
   })
     .populate('ficha', 'number')
     .lean();
-  return schedules
-    .filter(sched => sched?.ficha?.number)
-    .reduce((acc, sched) => {
+  const agrupados = {};
+  const sinFicha = [];
+
+  for (const sched of schedules) {
+    if (sched?.ficha?.number) {
       const numero = sched.ficha.number;
-      acc[numero] = acc[numero] || [];
-      acc[numero].push(sched);
-      return acc;
-    }, {});
+      agrupados[numero] = agrupados[numero] || [];
+      agrupados[numero].push(sched);
+    } else {
+      sinFicha.push(sched);
+    }
+  }
+
+  if (sinFicha.length > 0) {
+    console.warn(
+      `Se encontraron ${sinFicha.length} schedules sin ficha.number durante la obtención de pendientes.`
+    );
+    agrupados[SCHEDULES_SIN_FICHA_KEY] = sinFicha;
+  }
+
+  return agrupados;
 }
 
 /**
