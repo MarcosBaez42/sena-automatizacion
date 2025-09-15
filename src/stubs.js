@@ -28,7 +28,8 @@ export async function descargarJuicios(schedule) {
     session = await iniciarSesion();
   }
 
-  const filePath = await descargarReporte(session.page, schedule.fiche);
+  const codigoFicha = schedule.fiche.toString();
+  const filePath = await descargarReporte(session.page, codigoFicha);
   const { porEvaluar } = await obtenerFaltantes(filePath);
   return { calificado: porEvaluar === 0 };
 }

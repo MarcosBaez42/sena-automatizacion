@@ -28,8 +28,10 @@ export async function obtenerSchedulesPendientes() {
     ]
   }).lean();
   return schedules.reduce((acc, sched) => {
-    acc[sched.fiche] = acc[sched.fiche] || [];
-    acc[sched.fiche].push(sched);
+    const fiche = sched.fiche != null ? sched.fiche.toString() : undefined;
+    const normalized = { ...sched, fiche };
+    acc[fiche] = acc[fiche] || [];
+    acc[fiche].push(normalized);
     return acc;
   }, {});
 }
