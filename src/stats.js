@@ -4,6 +4,8 @@ import path from 'path';
 import { iniciarSesion, descargarReporte } from './loginDownload.js';
 import dbConnection from './database.js';
 import { Schedule } from './models/Schedule.js';
+import { Program } from './models/Program.js';
+import { Fiche } from './models/Fiche.js';
 
 const app = express();
 const PORT = 3000;
@@ -19,6 +21,75 @@ app.get('/datos', async (_req, res) => {
     res.json(JSON.parse(raw));
   } catch (err) {
     res.json({ fichas: [] });
+  }
+});
+
+app.get('/programas', async (_req, res) => {
+  try {
+    const connected = await dbConnection();
+    if (!connected) {
+      return res.json({ programs: [] });
+    }
+
+    const [programs, fiches] = await Promise.all([
+      Program.find({ status: { $ne: 1 } })
+        .sort({ name: 1 })
+        .lean(),
+      Fiche.find({ status: { $ne: 1 } })
+        .select('number program status')
+        .lean()
+    ]);
+
+    const fichesByProgram = fiches.reduce((map, fiche) => {
+      if (!fiche?.program) return map;
+      const id = fiche.program.toString();
+      if (!map.has(id)) {
+        map.set(id, []);
+      }
+      if (typeof fiche.number === 'string') {
+        map.get(id).push(fiche.number);
+      }
+      return map;
+    }, new Map());
+
+    const response = programs.map(program => {
+      const fichas = fichesByProgram.get(program._id.toString()) || [];
+      fichas.sort((a, b) => a.localeCompare(b));
+      return {
+        id: program._id.toString(),
+        code: typeof program.code === 'string' ? program.code : '',
+        name: typeof program.name === 'string' ? program.name : 'Programa sin nombre',
+        version: typeof program.version === 'string' ? program.version : '',
+        fiches: fichas,
+        ficheCount: fichas.length,
+        status: program.status
+      };
+    });
+
+    for (const [programId, fichas] of fichesByProgram.entries()) {
+      if (response.some(p => p.id === programId)) continue;
+      fichas.sort((a, b) => a.localeCompare(b));
+      response.push({
+        id: programId,
+        code: '',
+        name: 'Programa sin registrar',
+        version: '',
+        fiches: fichas,
+        ficheCount: fichas.length,
+        status: null
+      });
+    }
+
+    response.sort((a, b) => {
+      const nameCompare = a.name.localeCompare(b.name, 'es', { sensitivity: 'base' });
+      if (nameCompare !== 0) return nameCompare;
+      return a.code.localeCompare(b.code);
+    });
+
+    res.json({ programs: response });
+  } catch (err) {
+    console.error('Error obteniendo programas:', err);
+    res.status(500).json({ error: 'No se pudieron obtener los programas' });
   }
 });
 
