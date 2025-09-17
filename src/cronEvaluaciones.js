@@ -57,6 +57,7 @@ export async function evaluarSchedulesPendientes({ dbConnection, Schedule, Repor
             fechaCalificacion: new Date(),
             scheduleId: sched._id,
             ficha,
+            estado: 'calificado',
             info: { total, porEvaluar, aprobados, faltantes }
           });
         }
